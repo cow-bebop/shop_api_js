@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ぐるなびAPIテスト</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  </head>
+  <body>
+    <!-- <input type="text" id="key" placeholder="アクセスキーを入力" /><input
+      type="button"
+      id="submit"
+      value="送信"
+    /> -->
+    <input type="text" id="shop_name" placeholder="店舗名を入力" /><input
+      type="button"
+      id="shopName_submit"
+      value="送信"
+    />
+    <table id="table" border="1">
+      <tr>
+        <th>店舗名</th>
+        <th>営業時間</th>
+        <th>電話番号</th>
+        <th>住所</th>
+        <th>店舗ページ</th>
+      </tr>
+    </table>
+
+    <script>
+      const showResult = result => {
+        result.rest.map(item => {
+          $("#table").append(
+            `<tr><td>${item.name}</td><td>${item.opentime}</td><td>${item.tel}</td><td>${item.address}</td><td><a href="${item.url}">店舗ページ</a></td></tr>`
+          );
+        });
+      };
+
+      $(function() {
+        const url = "https://api.gnavi.co.jp/RestSearchAPI/v3/";
+        const params = {
+          keyid: "64e2ff3d3d78700b866058e740cef888",
+          name: "ホテルグランヴィア大阪 ロビーラウンジ",
+          latitude: 34.702492,
+          longitude: 135.495965,
+          range: 3
+        };
+        const params1 = {
+          keyid: "64e2ff3d3d78700b866058e740cef888",
+          // name: "ホテルグランヴィア大阪 ロビーラウンジ",
+          latitude: 34.702492,
+          longitude: 135.495965,
+          range: 5
+        };
+
+        $("#submit").on("click", () => {
+          // params.keyid = $("#key").value;
+          $.getJSON(url, params, result => {
+            showResult(result);
+          });
+        });
+
+        $("#shopName_submit").on("click", () => {
+          // params1.keyid = $("#key").val();
+          params1.name = $("#shop_name").val();
+          $.getJSON(url, params1, result => {
+            showResult(result);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
