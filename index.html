@@ -1,70 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>ぐるなびAPIテスト</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   </head>
+  <style>
+    body {
+      background: #ddd;
+    }
+    table {
+      display: inline-block;
+      overflow-x: auto;
+    }
+    table td {
+      width: 120px;
+    }
+    .main {
+      max-width: 980px;
+      margin: 30px auto 0;
+      background: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px;
+      background: #ddd;
+    }
+    .btn:hover {
+      cursor: pointer;
+    }
+  </style>
   <body>
-    <!-- <input type="text" id="key" placeholder="アクセスキーを入力" /><input
-      type="button"
-      id="submit"
-      value="送信"
-    /> -->
-    <input type="text" id="shop_name" placeholder="店舗名を入力" /><input
-      type="button"
-      id="shopName_submit"
-      value="送信"
-    />
-    <table id="table" border="1">
-      <tr>
-        <th>店舗名</th>
-        <th>営業時間</th>
-        <th>電話番号</th>
-        <th>住所</th>
-        <th>店舗ページ</th>
-      </tr>
-    </table>
+    <main class="main">
+      <h1>グルメ情報検索サイト</h1>
+
+      <div style="margin-top: 30px;">
+        <p>地域検索</p>
+        <select name="" id="form_pref" style="width: 300px;">
+          <option value="PREF13">東京</option>
+          <option value="PREF43">熊本</option>
+          <option value="PREF35">山口</option>
+          <option value="PREF26">京都</option>
+        </select>
+      </div>
+      <div style="margin-top: 30px;">
+        <p>フリーワード検索</p>
+        <input
+          style="width: 300px;padding: 5px;box-sizing: border-box"
+          type="text"
+          id="form_freeword"
+          placeholder="ジャンル 新宿駅 ランチ 個室"
+        />
+      </div>
+
+      <div class="btn" id="submit">
+        送信
+      </div>
+
+      <div class="" style="margin-top: 30px;">
+        検索内容
+        <span class="search_pref"></span> <span class="search_keyword"></span
+        ><br />
+        検索結果
+        <span class="search_number"></span> 件中 20 件を表示しています。
+      </div>
+
+      <table class="table" id="table" border="1" style="margin-top: 30px;">
+        <tbody>
+          <tr>
+            <th>No</th>
+            <th>店舗名</th>
+            <th>営業時間</th>
+            <th>電話番号</th>
+            <th>住所</th>
+            <th>店舗ページURL</th>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="" style="margin-top: 50px;">
+        <a href="https://api.gnavi.co.jp/api/scope/" target="_blank">
+          <img
+            src="https://api.gnavi.co.jp/api/img/credit/api_265_65.gif"
+            width="265"
+            height="65"
+            border="0"
+            alt="グルメ情報検索サイト　ぐるなび"
+          />
+        </a>
+      </div>
+    </main>
 
     <script>
-      const showResult = result => {
-        result.rest.map(item => {
-          $("#table").append(
-            `<tr><td>${item.name}</td><td>${item.opentime}</td><td>${item.tel}</td><td>${item.address}</td><td><a href="${item.url}">店舗ページ</a></td></tr>`
-          );
-        });
-      };
-
       $(function() {
-        const url = "https://api.gnavi.co.jp/RestSearchAPI/v3/";
-        const params = {
-          keyid: "64e2ff3d3d78700b866058e740cef888",
-          name: "ホテルグランヴィア大阪 ロビーラウンジ",
-          latitude: 34.702492,
-          longitude: 135.495965,
-          range: 3
-        };
-        const params1 = {
-          keyid: "64e2ff3d3d78700b866058e740cef888",
-          // name: "ホテルグランヴィア大阪 ロビーラウンジ",
-          latitude: 34.702492,
-          longitude: 135.495965,
-          range: 5
-        };
-
         $("#submit").on("click", () => {
-          // params.keyid = $("#key").value;
-          $.getJSON(url, params, result => {
-            showResult(result);
-          });
-        });
+          let params = {
+            url:
+              "https://api.gnavi.co.jp/RestSearchAPI/v3//?keyid=64e2ff3d3d78700b866058e740cef888&",
+            // 検索ワード
+            freeword: "",
+            // 検索県名
+            pref: "",
+            // 一ページあたりの表示数
+            hit_per_page: 20
+          };
 
-        $("#shopName_submit").on("click", () => {
-          // params1.keyid = $("#key").val();
-          params1.name = $("#shop_name").val();
-          $.getJSON(url, params1, result => {
-            showResult(result);
-          });
+          params.freeword = $("#form_freeword").val();
+          params.pref = $("#form_pref").val();
+          params.url = params.url + "hit_per_page=" + params.hit_per_page + "&";
+
+          if (params.pref) {
+            params.url = params.url + "pref=" + params.pref + "&";
+          }
+          if (params.freeword) {
+            params.url = params.url + "freeword=" + params.freeword + "&";
+          }
+
+          fetch(params.url)
+            .then(function(data) {
+              return data.json();
+            })
+            .then(function(json) {
+              console.log(json);
+              console.log(json.rest);
+              for (let i = 0; i < json.rest.length; i++) {
+                const name = json.rest[i].name;
+                const opentime = json.rest[i].opentime;
+                const tel = json.rest[i].tel;
+                const address = json.rest[i].address;
+                const url = json.rest[i].url;
+
+                //   const row = document.getElementById("table").insertRow();
+                //   row.insertCell().textContent = i + 1;
+                //   row.insertCell().textContent = name;
+                //   row.insertCell().textContent = opentime;
+                //   row.insertCell().textContent = tel;
+                //   row.insertCell().textContent = address;
+                //   row.insertCell().textContent = url;
+                $("#table").append(
+                  `<tr><td>${i +
+                    1}</td><td>${name}</<td><td>${opentime}</td><td>${tel}</td><td>${address}</td><td><a href="${url}">店舗ページ</a></td></tr>`
+                  // `<tr><td>' + name '</td><td>'${opentime}</td><td>${tel}</td><td>${address}</td><td><a href="${url}">店舗ページ</a></td></tr>`
+                );
+              }
+
+              $(".search_pref").text($("#form_pref option:selected").text());
+              $(".search_keyword").text(params.freeword);
+              $(".search_number").text(json.total_hit_count);
+            });
         });
       });
     </script>
